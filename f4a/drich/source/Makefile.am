@@ -5,9 +5,7 @@ AM_CPPFLAGS = \
   -I$(OFFLINE_MAIN)/include \
   -I$(ROOTSYS)/include \
   -I$(G4_MAIN)/include/ \
-  -I$(G4_MAIN)/include/Geant4 \
-  -I$(DRICH_HOME)/share/source \
-  -I$(DRICH_HOME)/esc/ci_DRICH
+  -I$(G4_MAIN)/include/Geant4
 
 AM_LDFLAGS = \
   -L$(libdir) \

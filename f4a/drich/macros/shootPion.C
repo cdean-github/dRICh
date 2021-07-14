@@ -75,7 +75,8 @@ void shootPion(int nEvents = -1, Bool_t enableGUI=false, Bool_t verbose=false) {
   g4->save_DST_geometry(false); // disable this, if not tracking
   // - dRICh module
   dRIChSubsystem *drichSubsys = new dRIChSubsystem("dRICh");
-  drichSubsys ->set_int_param("verbosity", verbose ? 1 : 0);
+  //drichSubsys ->set_int_param("verbosity", verbose ? 1 : 0);
+  drichSubsys->Verbosity(10);
   drichSubsys->SetActive();
   g4->registerSubsystem(drichSubsys);
   // - register geant4 module

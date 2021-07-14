@@ -2,10 +2,10 @@
 #define DRICHHIT_H
 
 #include <g4main/PHG4Hit.h>
-#include <g4main/PHG4Hitv1.h>
 #include <g4main/PHG4HitDefs.h>
+#include <g4main/PHG4Hitv1.h>
 
-#include <climits>  // for INT_MIN, ULONG_LONG_MAX
+#include <climits> // for INT_MIN, ULONG_LONG_MAX
 #include <cmath>
 #include <cstdint>
 #include <iostream>
@@ -13,14 +13,14 @@
 #include <string>
 #include <utility>
 
-#include <G4ThreeVector.hh>
 #include <G4String.hh>
+#include <G4ThreeVector.hh>
 
-class dRIChHit : public PHG4Hit
+class dRIChHit : public PHG4Hit 
 {
   public:
     dRIChHit() = default;
-    explicit dRIChHit(const PHG4Hit* g4hit);
+    explicit dRIChHit(const PHG4Hit *g4hit);
     virtual ~dRIChHit() = default;
     void Reset();
 
@@ -35,7 +35,7 @@ class dRIChHit : public PHG4Hit
     G4ThreeVector get_momentum_dir() const { return momDir; }
     G4ThreeVector get_vertex_position() const { return vtxPos; }
     G4ThreeVector get_vertex_momentum_dir() const { return vtxMomDir; }
-    float get_delta_t() const { return t[1]-t[0]; }
+    float get_delta_t() const { return t[1] - t[0]; }
     G4String get_hit_type_name() const { return hitTypeName; }
     G4String get_hit_subtype_name() const { return hitSubtypeName; }
     int get_petal() const { return petal; }
@@ -63,19 +63,16 @@ class dRIChHit : public PHG4Hit
     void set_psst(const int i) { psst = i; }
     void set_pdg(const int i) { pdg = i; }
     void set_particle_name(const G4String s) { pname = s; }
-    void set_process(const G4String s) { process = s; };
-    void set_parent_id(const int i) { parentID = i; };
+    void set_process(const G4String s) { process = s; }
+    void set_parent_id(const int i) { parentID = i; }
 
     void set_edep(const float f) { edep = f; }
     void set_hit_id(const PHG4HitDefs::keytype i) { hitid = i; }
     void set_shower_id(const int i) { showerid = i; }
     void set_trkid(const int i) { trackid = i; }
 
-
     // diagnostics
     virtual void print() const;
-
-
 
   protected:
     float x[2] = {NAN, NAN};
@@ -83,18 +80,17 @@ class dRIChHit : public PHG4Hit
     float z[2] = {NAN, NAN};
     float t[2] = {NAN, NAN};
     G4ThreeVector hitPos[2];
-    G4ThreeVector momVec,momDir,vtxPos,vtxMomDir;
+    G4ThreeVector momVec, momDir, vtxPos, vtxMomDir;
     G4String hitTypeName, hitSubtypeName;
     int petal = INT_MIN;
     int psst = INT_MIN;
     int pdg = INT_MIN;
-    G4String pname,process;
+    G4String pname, process;
     int parentID;
     PHG4HitDefs::keytype hitid = ULONG_LONG_MAX;
     int trackid = INT_MIN;
     int showerid = INT_MIN;
     float edep = NAN;
-
 };
 
 #endif
