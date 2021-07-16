@@ -1,18 +1,22 @@
 #ifndef G4E_CI_DRICH_MODEL_HH
 #define G4E_CI_DRICH_MODEL_HH
 
-#include "G4Color.hh"
-#include "G4Element.hh"
-#include "G4LogicalSkinSurface.hh"
-#include "G4Material.hh"
-#include "G4MaterialPropertiesTable.hh"
-#include "G4OpticalSurface.hh"
-#include "G4RotationMatrix.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4VisAttributes.hh"
-#include "G4tgbMaterialMgr.hh"
-#include "G4tgbVolumeMgr.hh"
+#include <fun4all/Fun4AllBase.h>
+#include <fun4all/SubsysReco.h>
+
+#include <G4Color.hh>
+#include <G4Element.hh>
+#include <G4LogicalSkinSurface.hh>
+#include <G4Material.hh>
+#include <G4MaterialPropertiesTable.hh>
+#include <G4OpticalSurface.hh>
+#include <G4RotationMatrix.hh>
+#include <G4SystemOfUnits.hh>
+#include <G4VisAttributes.hh>
+#include <G4tgbMaterialMgr.hh>
+#include <G4tgbVolumeMgr.hh>
 #include <G4PVDivision.hh>
+
 #include <iostream>
 
 /*
@@ -23,7 +27,7 @@
 // Generic optical parameters class
 //
 
-class g4dRIChOptics 
+class EICG4dRICHOptics : public SubsysReco 
 {
   public:
     double *scaledE; // photon energies
@@ -40,10 +44,13 @@ class g4dRIChOptics
     // logVolName: logical volume name
     // if name is "_NA_", properties are not applied to the corresponding
     // component
-    g4dRIChOptics(const G4String matName, const G4String logVolName) 
+    EICG4dRICHOptics(const G4String matName, const G4String logVolName) 
     {
-      std::cout << "#=======================================================================" << std::endl;
-      std::cout << "# Set Optical Properties" << std::endl;
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      {
+        std::cout << "#=======================================================================" << std::endl;
+        std::cout << "# Set Optical Properties" << std::endl;
+     }
 
       materialName = matName;
       logicalVName = logVolName;
@@ -59,15 +66,14 @@ class g4dRIChOptics
 
       if (matName != "_NA_") 
       {
-
-        std::cout << "# Material " << matName.data() << std::endl;
+        if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) std::cout << "# Material " << matName.data() << std::endl;
 
         mat = G4tgbMaterialMgr::GetInstance()->FindBuiltG4Material(matName);
 
         if (mat == NULL) 
         {
           pTable = NULL;
-          std::cout << "# ERROR: Cannot retrieve " << matName.data() << " material in ci_DRICH"  << std::endl;
+          std::cout << "# ERROR: Cannot retrieve " << matName.data() << " material in EICG4dRICH"  << std::endl;
           // handle error
         } 
         else 
@@ -77,7 +83,10 @@ class g4dRIChOptics
 
         if (pTable == NULL) 
         {
-          std::cout << "# No properties table available for " << matName.data() << ", allocated a new one\n" << std::endl;
+          if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) 
+          {
+            std::cout << "# No properties table available for " << matName.data() << ", allocated a new one\n" << std::endl;
+          }
           pTable = new G4MaterialPropertiesTable();
         } 
         else 
@@ -88,17 +97,17 @@ class g4dRIChOptics
 
       if (logVolName != "_NA_") 
       {
-        std::cout << "# Logical Volume " << logVolName.data() << std::endl;
+        if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) std::cout << "# Logical Volume " << logVolName.data() << std::endl;
         logVolume = G4tgbVolumeMgr::GetInstance()->FindG4LogVol(logVolName, 0);
         if (logVolume == NULL) 
         {
-          std::cout << "# ERROR: Cannot retrieve " << logVolName.data() << " logical volume in ci_DRICH" << std::endl;
+          std::cout << "# ERROR: Cannot retrieve " << logVolName.data() << " logical volume in EICG4dRICH" << std::endl;
           // handle error
         }
       }
     }
 
-    ~g4dRIChOptics() 
+    ~EICG4dRICHOptics() 
     {
       if (scaledE != NULL) delete[] scaledE;
       if (scaledN != NULL) delete[] scaledN;
@@ -138,8 +147,11 @@ class g4dRIChOptics
       //    @@@ pTable->AddConstProperty("RESOLUTIONSCALE", 1.0); // @@@ TBC @@@
 
       mat->SetMaterialPropertiesTable(pTable);
-      std::cout << "# Optical Table for material " << materialName.data() << " with " << nEntries << " points:" << std::endl;
-      pTable->DumpTable();
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      { 
+        std::cout << "# Optical Table for material " << materialName.data() << " with " << nEntries << " points:" << std::endl;
+        pTable->DumpTable();
+      }
     }
 
     // allocate and add properties to the MaterialPropertiesTable
@@ -150,9 +162,11 @@ class g4dRIChOptics
       if (scaledSR != NULL) pTab->AddProperty("REFLECTIVITY", scaledE, scaledSR, nE);
       if (scaledN != NULL) pTab->AddProperty("REALRINDEX", scaledE, scaledN, nE);
       if (scaledIN != NULL) pTab->AddProperty("IMAGINARYRINDEX", scaledE, scaledIN, nE);
-      std::cout << "# Optical Table for volume " << logicalVName.data() << " with " << nE << " points:" << std::endl;
-      pTab->DumpTable();
-
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      {  
+        std::cout << "# Optical Table for volume " << logicalVName.data() << " with " << nE << " points:" << std::endl;
+        pTab->DumpTable();
+      }
       return pTab;
     }
 
@@ -175,10 +189,10 @@ class g4dRIChOptics
 //
 // Aerogel
 //
-class g4dRIChAerogel : public g4dRIChOptics 
+class EICG4dRICHAerogel : public EICG4dRICHOptics
 {
   public:
-    g4dRIChAerogel(const G4String matName) : g4dRIChOptics(matName, "_NA_"){}
+    EICG4dRICHAerogel(const G4String matName) : EICG4dRICHOptics(matName, "_NA_"){}
     //
     // Compute the refractive index, absorption length, scattering length for
     // different energies points
@@ -192,7 +206,7 @@ class g4dRIChAerogel : public g4dRIChOptics
     //
     // data are scaled according to the input density of the aerogel
     //
-    int setOpticalParams(int mode) 
+    int setOpticalParams(int mode) override 
     {
       const double aeroE[] = // energy : wavelenth 660 nm -> 200 nm
         {1.87855 * eV, 1.96673 * eV, 2.05490 * eV, 2.14308 * eV, 2.23126 * eV,
@@ -245,7 +259,10 @@ class g4dRIChAerogel : public g4dRIChOptics
       const int nEntries = sizeof(aeroE) / sizeof(double);
 
       double density = mat->GetDensity();
-      std::cout << "# Aerogel Density : " << density / (g / cm3) << " g/cm3" << std::endl;
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      {
+        std::cout << "# Aerogel Density : " << density / (g / cm3) << " g/cm3" << std::endl;
+      }
 
       double refn = density2refIndex(density); // use a n vs rho formula with provide n at 400 nm
       double refwl = 400 * nm;
@@ -314,9 +331,11 @@ class g4dRIChAerogel : public g4dRIChOptics
         scaledS[i] = aeroS[i] * (rho * g / cm3) / density; // approx. larger the density, smaller the abs. length
       }
 
-      std::cout << "# Aerogel Refractive Index, Absorption and Scattering Lengths rescaled to density ";
-      std::cout << density / g * cm3 << " g/cm3, method: " << mode << std::endl;
-
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      {
+        std::cout << "# Aerogel Refractive Index, Absorption and Scattering Lengths rescaled to density ";
+        std::cout << density / g * cm3 << " g/cm3, method: " << mode << std::endl;
+      }
       setMatPropTable(nEntries);
 
       return nEntries;
@@ -391,14 +410,14 @@ class g4dRIChAerogel : public g4dRIChOptics
 // Acrylic Filter
 //
 
-class g4dRIChFilter : public g4dRIChOptics 
+class EICG4dRICHFilter : public EICG4dRICHOptics 
 {
   public:
-    g4dRIChFilter(const G4String matName) : g4dRIChOptics(matName, "_NA_"){}
+    EICG4dRICHFilter(const G4String matName) : EICG4dRICHOptics(matName, "_NA_"){}
 
     // wlthr: threshold wavelength for low pass filter
     // mode currently not used
-    int setOpticalParams(double wlthr) 
+    int setOpticalParams(double wlthr) override 
     {
       const double acryE[] = // energy : wavelenth 660 nm -> 200 nm
         {1.87855 * eV, 1.96673 * eV, 2.05490 * eV, 2.14308 * eV, 2.23126 * eV,
@@ -476,8 +495,11 @@ class g4dRIChFilter : public g4dRIChOptics
         scaledS[i] = 100000. * cm; // @@@@
       }
 
-      std::cout << "# Acrylic Filter Refractive Index, Absorption and Scattering Lengths rescaled to wavelength threshold " << wlthr / nm << " nm" << std::endl;
-
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      {
+        std::cout << "# Acrylic Filter Refractive Index, Absorption and Scattering Lengths";
+        std::cout << " rescaled to wavelength threshold " << wlthr / nm << " nm" << std::endl;
+      }
       setMatPropTable(nEntries);
 
       return nEntries;
@@ -490,31 +512,34 @@ class g4dRIChFilter : public g4dRIChOptics
 // gas
 //
 
-class g4dRIChGas : public g4dRIChOptics 
+class EICG4dRICHGas : public EICG4dRICHOptics 
 {
   public:
-    g4dRIChGas(const G4String matName) : g4dRIChOptics(matName, "_NA_") 
+    EICG4dRICHGas(const G4String matName) : EICG4dRICHOptics(matName, "_NA_") 
     {
 
       int nel = mat->GetNumberOfElements();
-      std::cout << "# Gas material number of elements " << nel << std::endl;
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      {
+        std::cout << "# Gas material number of elements " << nel << std::endl;
 
-      chemFormula = "";
+        chemFormula = "";
 
-      for (int i = 0; i < nel; i++) 
-      { // extract chemical formula from gas material
-        auto ele = mat->GetElement(i);
-        std::cout << "# Element " << i;
-        std::cout << " : Z " << ele->GetZ();
-        std::cout << " Name " << ele->GetSymbol().data();
-        std::cout << " Atoms " << mat->GetAtomsVector()[i] << std::endl;
+        for (int i = 0; i < nel; i++) 
+        { // extract chemical formula from gas material
+          auto ele = mat->GetElement(i);
+          std::cout << "# Element " << i;
+          std::cout << " : Z " << ele->GetZ();
+          std::cout << " Name " << ele->GetSymbol().data();
+          std::cout << " Atoms " << mat->GetAtomsVector()[i] << std::endl;
 
-        chemFormula = chemFormula + ele->GetSymbol() + std::to_string(mat->GetAtomsVector()[i]);
+          chemFormula = chemFormula + ele->GetSymbol() + std::to_string(mat->GetAtomsVector()[i]);
+        }
+        std::cout << "# Chemical Formula : " <<  chemFormula.data() << std::endl;
       }
-      std::cout << "# Chemical Formula : " <<  chemFormula.data() << std::endl;
     }
 
-    int setOpticalParams() 
+    int setOpticalParams() override
     {
 
       // very approximate values
@@ -550,7 +575,10 @@ class g4dRIChGas : public g4dRIChOptics
         if (chemFormula == gasType[i]) igas = i;
       }
 
-      std::cout << "# Selected gas index " << igas << " for gas " << chemFormula.data() << std::endl;
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      {
+        std::cout << "# Selected gas index " << igas << " for gas " << chemFormula.data() << std::endl;
+      }
 
       double density = mat->GetDensity();
       double refn = Ksr[igas] * density + 1.;
@@ -584,8 +612,11 @@ class g4dRIChGas : public g4dRIChOptics
         scaledS[i] = 100000. * cm; // @@@@
       }
 
-      std::cout << "# Gas Refractive Index, Absorption and Scattering Lengths rescaled ";
-      std::cout << "to density " << density / g * cm3 << " g/cm3, gas index: " << igas << std::endl;
+      if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+      {
+        std::cout << "# Gas Refractive Index, Absorption and Scattering Lengths rescaled ";
+        std::cout << "to density " << density / g * cm3 << " g/cm3, gas index: " << igas << std::endl;
+      }
       setMatPropTable(nEntries);
 
       return nEntries;
@@ -599,14 +630,14 @@ class g4dRIChGas : public g4dRIChOptics
 // Mirror
 //
 
-class g4dRIChMirror : public g4dRIChOptics 
+class EICG4dRICHMirror : public EICG4dRICHOptics 
 {
   public:
-    g4dRIChMirror(const G4String logName) : g4dRIChOptics("_NA_", logName){}
+    EICG4dRICHMirror(const G4String logName) : EICG4dRICHOptics("_NA_", logName){}
 
     // pSurfName: prefix used to generate surface names inserted in optical table
 
-    int setOpticalParams(G4String pSurfName) 
+    int setOpticalParams(G4String pSurfName) override 
     {
 
       G4String surfaceName = pSurfName + "mirrorSurf";
@@ -674,14 +705,14 @@ class g4dRIChMirror : public g4dRIChOptics
 // photo sensor
 //
 
-class g4dRIChPhotosensor : public g4dRIChOptics 
+class EICG4dRICHPhotosensor : public EICG4dRICHOptics 
 {
   public:
-    g4dRIChPhotosensor(const G4String logName) : g4dRIChOptics("_NA_", logName){}
+    EICG4dRICHPhotosensor(const G4String logName) : EICG4dRICHOptics("_NA_", logName){}
 
     // pSurfName: prefix used to generate surface names inserted in optical table
 
-    int setOpticalParams(G4String pSurfName) 
+    int setOpticalParams(G4String pSurfName) override 
     {
 
       G4String surfaceName = pSurfName + "phseSurf";

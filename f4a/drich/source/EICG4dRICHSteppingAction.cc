@@ -1,6 +1,6 @@
-#include "dRIChSteppingAction.h"
-#include "dRIChDetector.h"
-#include "dRIChHit.h"
+#include "EICG4dRICHSteppingAction.h"
+#include "EICG4dRICHDetector.h"
+#include "EICG4dRICHHit.h"
 
 #include <phparameter/PHParameters.h>
 
@@ -38,14 +38,9 @@
 #include <string>
 
 class PHCompositeNode;
-/*
-using std::std::cerr;
-using std::std::cout;
-using std::std::endl;
-using std::string;
-*/
+
 //____________________________________________________________________________..
-dRIChSteppingAction::dRIChSteppingAction(dRIChDetector *detector,
+EICG4dRICHSteppingAction::EICG4dRICHSteppingAction(EICG4dRICHDetector *detector,
                                          const PHParameters *parameters)
     : PHG4SteppingAction(detector->GetName())
     , m_Detector(detector)
@@ -84,7 +79,7 @@ dRIChSteppingAction::dRIChSteppingAction(dRIChDetector *detector,
 }
 
 //____________________________________________________________________________..
-dRIChSteppingAction::~dRIChSteppingAction() 
+EICG4dRICHSteppingAction::~EICG4dRICHSteppingAction() 
 {
   // if the last hit was a zero energy deposit hit, it is
   // just reset and the memory is still allocated, so we
@@ -96,13 +91,13 @@ dRIChSteppingAction::~dRIChSteppingAction()
 
 //____________________________________________________________________________..
 // This is the implementation of the G4 UserSteppingAction
-bool dRIChSteppingAction::UserSteppingAction(const G4Step *aStep,
+bool EICG4dRICHSteppingAction::UserSteppingAction(const G4Step *aStep,
                                              bool was_used) 
 {
 
   if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
   {
-    std::cout << "[>>>>>] call dRIChSteppingAction::UserSteppingAction" << std::endl;
+    std::cout << "[>>>>>] call EICG4dRICHSteppingAction::UserSteppingAction" << std::endl;
   }
 
   // get touchables, points, volumes
@@ -253,7 +248,7 @@ bool dRIChSteppingAction::UserSteppingAction(const G4Step *aStep,
     {
       m_Hit = nullptr; // kill any leftover hit
       if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) std::cout << "[++++] NEW hit (entrance)" << std::endl;
-      m_Hit = new dRIChHit();
+      m_Hit = new EICG4dRICHHit();
       this->InitHit(prePoint, aTrack, true);
     }
     break;
@@ -275,7 +270,7 @@ bool dRIChSteppingAction::UserSteppingAction(const G4Step *aStep,
     if (!m_Hit) 
     {
       if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) std::cout << "[++++] NEW hit" << std::endl;
-      m_Hit = new dRIChHit();
+      m_Hit = new EICG4dRICHHit();
       this->InitHit(prePoint, aTrack, true);
     } 
     else 
@@ -318,8 +313,7 @@ bool dRIChSteppingAction::UserSteppingAction(const G4Step *aStep,
   }
 
   // This section is called for every step -------------------------------------
-  // - some sanity checks for inconsistencies (aka bugs) we have seen over the
-  // years
+  // - some sanity checks for inconsistencies (aka bugs) we have seen over the years
   // - check if this hit was created, if not print out last post step status
   if (!m_Hit || !std::isfinite(m_Hit->get_x(0))) 
   {
@@ -491,7 +485,7 @@ bool dRIChSteppingAction::UserSteppingAction(const G4Step *aStep,
 }
 
 //____________________________________________________________________________..
-void dRIChSteppingAction::InitHit(const G4StepPoint *prePoint_,
+void EICG4dRICHSteppingAction::InitHit(const G4StepPoint *prePoint_,
                                   const G4Track *aTrack_,
                                   bool resetAccumulators) 
 {
@@ -510,7 +504,7 @@ void dRIChSteppingAction::InitHit(const G4StepPoint *prePoint_,
 }
 
 //____________________________________________________________________________..
-void dRIChSteppingAction::SetInterfacePointers(PHCompositeNode *topNode) 
+void EICG4dRICHSteppingAction::SetInterfacePointers(PHCompositeNode *topNode) 
 {
   std::string hitnodename = "G4HIT_" + m_Detector->GetName();
   // now look for the map and grab a pointer to it.
@@ -518,6 +512,6 @@ void dRIChSteppingAction::SetInterfacePointers(PHCompositeNode *topNode)
   // if we do not find the node we need to make it.
   if (!m_HitContainer) 
   {
-    std::cout << "dRIChSteppingAction::SetTopNode - unable to find " << hitnodename << std::endl;
+    std::cout << "EICG4dRICHSteppingAction::SetTopNode - unable to find " << hitnodename << std::endl;
   }
 }

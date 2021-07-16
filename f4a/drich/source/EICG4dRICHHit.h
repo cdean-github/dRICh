@@ -16,12 +16,12 @@
 #include <G4String.hh>
 #include <G4ThreeVector.hh>
 
-class dRIChHit : public PHG4Hit 
+class EICG4dRICHHit : public PHG4Hit 
 {
   public:
-    dRIChHit() = default;
-    explicit dRIChHit(const PHG4Hit *g4hit);
-    virtual ~dRIChHit() = default;
+    EICG4dRICHHit() = default;
+    explicit EICG4dRICHHit(const PHG4Hit *g4hit);
+    virtual ~EICG4dRICHHit() = default;
     void Reset();
 
     // accessors

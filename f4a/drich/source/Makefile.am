@@ -4,7 +4,7 @@ AM_CPPFLAGS = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include \
   -I$(ROOTSYS)/include \
-  -I$(G4_MAIN)/include/ \
+  -I$(G4_MAIN)/include \
   -I$(G4_MAIN)/include/Geant4
 
 AM_LDFLAGS = \
@@ -13,20 +13,20 @@ AM_LDFLAGS = \
   -L$(OFFLINE_MAIN)/lib64
 
 pkginclude_HEADERS = \
-  dRIChSubsystem.h\
-	dRIChTree.h
+  EICG4dRICHSubsystem.h\
+  EICG4dRICHTree.h
 
 lib_LTLIBRARIES = \
-  libdRICh.la
+  libEICG4dRICH.la
 
-libdRICh_la_SOURCES = \
-  dRIChSubsystem.cc\
-  dRIChDetector.cc\
-	dRIChHit.cc\
-  dRIChSteppingAction.cc\
-	dRIChTree.cc
+libEICG4dRICH_la_SOURCES = \
+  EICG4dRICHSubsystem.cc\
+  EICG4dRICHDetector.cc\
+  EICG4dRICHHit.cc\
+  EICG4dRICHSteppingAction.cc\
+  EICG4dRICHTree.cc
 
-libdRICh_la_LIBADD = \
+libEICG4dRICH_la_LIBADD = \
   -lphool \
   -lSubsysReco\
   -lg4detectors\
@@ -38,7 +38,7 @@ noinst_PROGRAMS = \
   testexternals
 
 testexternals_SOURCES = testexternals.cc
-testexternals_LDADD   = libdRICh.la
+testexternals_LDADD   = libEICG4dRICH.la
 
 testexternals.cc:
 	echo "//*** this is a generated file. Do not commit, do not edit" > $@

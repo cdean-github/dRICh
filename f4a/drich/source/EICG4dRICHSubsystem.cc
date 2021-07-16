@@ -4,14 +4,13 @@
 // parameters you use for your detector in the SetDefaultParameters() method
 // here The place to do this is marked by //implement your own here// The
 // parameters have no units, they need to be converted in the
-// dRIChDetector::ConstructMe() method
+// EICG4dRICHDetector::ConstructMe() method
 // but the convention is as mentioned cm and deg
 //____________________________________________________________________________..
 //
-#include "dRIChSubsystem.h"
-
-#include "dRIChDetector.h"
-#include "dRIChSteppingAction.h"
+#include "EICG4dRICHDetector.h"
+#include "EICG4dRICHSteppingAction.h"
+#include "EICG4dRICHSubsystem.h"
 
 #include <phparameter/PHParameters.h>
 
@@ -25,10 +24,8 @@
 #include <phool/PHObject.h>
 #include <phool/getClass.h>
 
-//using namespace std;
-
 //_______________________________________________________________________
-dRIChSubsystem::dRIChSubsystem(const std::string &name)
+EICG4dRICHSubsystem::EICG4dRICHSubsystem(const std::string &name)
     : PHG4DetectorSubsystem(name)
     , m_Detector(nullptr)
     , m_SteppingAction(nullptr) 
@@ -38,7 +35,7 @@ dRIChSubsystem::dRIChSubsystem(const std::string &name)
   InitializeParameters();
 }
 //_______________________________________________________________________
-int dRIChSubsystem::InitRunSubsystem(PHCompositeNode *topNode) 
+int EICG4dRICHSubsystem::InitRunSubsystem(PHCompositeNode *topNode) 
 {
   PHNodeIterator iter(topNode);
   PHCompositeNode *dstNode = dynamic_cast<PHCompositeNode*>(iter.findFirst("PHCompositeNode", "DST"));
@@ -59,18 +56,28 @@ int dRIChSubsystem::InitRunSubsystem(PHCompositeNode *topNode)
       DetNode->addNode(new PHIODataNode<PHObject>(g4_hits, g4hitnodename, "PHObject"));
     }
   }
+
+  if (m_geoFile.empty())
+  {
+    std::cout << "ERROR in " << __FILE__ << ": No EICG4dRICH geometry file specified. Abort detector construction." << std::endl;
+    std::cout << "Please run SetGeometryFile(std::string filename) first." << std::endl;
+    exit(1);
+  }
+  set_string_param("mapping_file", m_geoFile);
+  UpdateParametersWithMacro();
+
   // create detector
-  m_Detector = new dRIChDetector(this, topNode, GetParams(), Name());
+  m_Detector = new EICG4dRICHDetector(this, topNode, GetParams(), Name());
   m_Detector->OverlapCheck(CheckOverlap());
   // create stepping action if detector is active
   if (GetParams()->get_int_param("active")) 
   {
-    m_SteppingAction = new dRIChSteppingAction(m_Detector, GetParams());
+    m_SteppingAction = new EICG4dRICHSteppingAction(m_Detector, GetParams());
   }
   return 0;
 }
 //_______________________________________________________________________
-int dRIChSubsystem::process_event(PHCompositeNode *topNode) 
+int EICG4dRICHSubsystem::process_event(PHCompositeNode *topNode) 
 {
   // pass top node to stepping action so that it gets
   // relevant nodes needed internally
@@ -81,7 +88,7 @@ int dRIChSubsystem::process_event(PHCompositeNode *topNode)
   return 0;
 }
 //_______________________________________________________________________
-void dRIChSubsystem::Print(const std::string &what) const 
+void EICG4dRICHSubsystem::Print(const std::string &what) const 
 {
   if (m_Detector) 
   {
@@ -91,10 +98,10 @@ void dRIChSubsystem::Print(const std::string &what) const
 }
 
 //_______________________________________________________________________
-PHG4Detector *dRIChSubsystem::GetDetector(void) const { return m_Detector; }
+PHG4Detector *EICG4dRICHSubsystem::GetDetector(void) const { return m_Detector; }
 
 //_______________________________________________________________________
-void dRIChSubsystem::SetDefaultParameters() 
+void EICG4dRICHSubsystem::SetDefaultParameters() 
 {
   //set_default_int_param("verbosity", 0);
   // sizes are in cm
@@ -114,4 +121,5 @@ void dRIChSubsystem::SetDefaultParameters()
 
   set_default_string_param("material", "G4_Cu");
   */
+  set_default_string_param("mapping_file", m_geoFile.c_str());
 }

@@ -4,6 +4,7 @@ drich/build/
 drich/source/*
 !drich/source/*.cc
 !drich/source/*.h
+!drich/source/*.hh
 !drich/source/autogen.sh
 !drich/source/*.ac
 !drich/source/*.am

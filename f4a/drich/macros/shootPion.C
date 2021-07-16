@@ -4,15 +4,15 @@
 // load libs
 R__LOAD_LIBRARY(libfun4all.so)
 R__LOAD_LIBRARY(libg4detectors.so)
-R__LOAD_LIBRARY(libdRICh.so)
+R__LOAD_LIBRARY(libEICG4dRICH.so)
 R__LOAD_LIBRARY(libg4histos.so)
 
 // in fun4all singularity container, these include directives
 // are with respect to $ROOT_INCLUDE_PATH
 
 // - $DRICH_HOME/f4a/install/include
-#include <drich/dRIChSubsystem.h>
-#include <drich/dRIChTree.h>
+#include <g4drich/EICG4dRICHSubsystem.h>
+#include <g4drich/EICG4dRICHTree.h>
 
 // - $OFFLINE_MAIN/include
 #include <g4detectors/PHG4DetectorSubsystem.h>
@@ -74,9 +74,12 @@ void shootPion(int nEvents = -1, Bool_t enableGUI=false, Bool_t verbose=false) {
   g4->set_field(0);
   g4->save_DST_geometry(false); // disable this, if not tracking
   // - dRICh module
-  dRIChSubsystem *drichSubsys = new dRIChSubsystem("dRICh");
-  //drichSubsys ->set_int_param("verbosity", verbose ? 1 : 0);
-  drichSubsys->Verbosity(10);
+  EICG4dRICHSubsystem *drichSubsys = new EICG4dRICHSubsystem("dRICH");
+  drichSubsys->SetGeometryFile(string(getenv("DRICH_HOME")) + "/f4a/drich/source/drich-g4model.txt");
+  //drichSubsys->SetGeometryFile("/sphenix/user/cdean/ECCE/fun4all_eiccalibrations/dRICH/mapping/drich-g4model.txt");
+  //drichSubsys->set_double_param("place_z", 0.);// relative position to mother vol.
+  drichSubsys->OverlapCheck(verbose ? 1 : 0);
+  drichSubsys->Verbosity(verbose ? 11 : 0);
   drichSubsys->SetActive();
   g4->registerSubsystem(drichSubsys);
   // - register geant4 module
@@ -84,7 +87,7 @@ void shootPion(int nEvents = -1, Bool_t enableGUI=false, Bool_t verbose=false) {
 
   // hits module
   G4HitNtuple *hits = new G4HitNtuple("Hits");
-  hits->AddNode("dRICh_0", 0); /* NOTE:
+  hits->AddNode("dRICH_0", 0); /* NOTE:
       * node name must match the
       * subsystem name, appended with "_detectorID"; the
       * second argument of AddNode is the detector ID
@@ -92,7 +95,7 @@ void shootPion(int nEvents = -1, Bool_t enableGUI=false, Bool_t verbose=false) {
   f4a->registerSubsystem(hits);
 
   // tree module
-  dRIChTree *outTree = new dRIChTree("dRIChTree","dRIChTree.root");
+  EICG4dRICHTree *outTree = new EICG4dRICHTree("dRICHTree","dRICHTree.root");
   outTree->Verbosity(verbose ? 11 : 0); // (0=silence, 11=full verbosity)
   f4a->registerSubsystem(outTree);
 

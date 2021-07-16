@@ -1,11 +1,10 @@
-#ifndef ci_DRICH_Config_HH
-#define ci_DRICH_Config_HH
+#ifndef EICG4dRICHConfig_HH
+#define EICG4dRICHConfig_HH
 
-//#include <InitializationContext.hh>
 #include <G4GenericMessenger.hh>
 #include <G4SystemOfUnits.hh>
 
-struct ci_DRICH_Config 
+struct EICG4dRICHConfig 
 {
 
   // define here Global volume parameters
@@ -66,17 +65,17 @@ struct ci_DRICH_Config
   double wavelength_ref = 400 * nm; // reference wavelength (for aerogel, gas, mirror ...)
 
   // Create a global messenger that will be used
-  inline ci_DRICH_Config() 
+  inline EICG4dRICHConfig() 
   {
     static G4GenericMessenger *Messenger;
 
     if (!Messenger) 
     {
       // Set geant options
-      Messenger = new G4GenericMessenger(this, "/eic/ci_DRICH/");
+      Messenger = new G4GenericMessenger(this, "/EICG4dRICH/");
 
       //    Messenger->SetDirectory("Vessel"); // TBC if ok, we can define a dir
-      //    for each sub-components of the dRICH
+      //    for each sub-components of the EICG4dRICH
       /*
         auto cmd = Messenger->DeclarePropertyWithUnit("VesselLength", "cm",
         vessel_dz, "Rich Vessel Longitudinal size, along beam (z), cone
@@ -153,4 +152,4 @@ struct ci_DRICH_Config
   }
 };
 
-#endif // ci_DRICH_Config_HH
+#endif // EICG4dRICHConfig_HH

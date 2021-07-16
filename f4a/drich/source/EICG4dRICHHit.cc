@@ -1,14 +1,10 @@
-#include "dRIChHit.h"
+#include "EICG4dRICHHit.h"
 
 #include <phool/phool.h>
-/*
-using std::cerr;
-using std::cout;
-using std::endl;
-*/
-dRIChHit::dRIChHit(const PHG4Hit *g4hit) { CopyFrom(g4hit); };
 
-void dRIChHit::Reset() 
+EICG4dRICHHit::EICG4dRICHHit(const PHG4Hit *g4hit) { CopyFrom(g4hit); };
+
+void EICG4dRICHHit::Reset() 
 { // TODO: make sure this is filled out
   hitid = ULONG_LONG_MAX;
   trackid = INT_MIN;
@@ -21,7 +17,7 @@ void dRIChHit::Reset()
   };
 };
 
-int dRIChHit::get_detid() const 
+int EICG4dRICHHit::get_detid() const 
 {
   // a compile time check if the hit_idbits are within range (1-32)
   static_assert(PHG4HitDefs::hit_idbits <= sizeof(unsigned int) * 8,
@@ -30,9 +26,9 @@ int dRIChHit::get_detid() const
   return detid;
 };
 
-void dRIChHit::print() const 
+void EICG4dRICHHit::print() const 
 {
-  std::cout << "New dRIChHit  " << hitid << "  on track " << trackid << " EDep "
+  std::cout << "New EICG4dRICHHit  " << hitid << "  on track " << trackid << " EDep "
        << edep << std::endl;
   std::cout << "Location: X " << x[0] << "/" << x[1] << "  Y " << y[0] << "/" << y[1]
        << "  Z " << z[0] << "/" << z[1] << std::endl;

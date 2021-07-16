@@ -5,27 +5,27 @@
 
 class PHCompositeNode;
 class PHG4Detector;
-class dRIChDetector;
+class EICG4dRICHDetector;
 class PHG4SteppingAction;
 
 /**
  * \brief Detector Subsystem module
  *
- * The detector is constructed and registered via dRIChDetector
+ * The detector is constructed and registered via EICG4dRICHDetector
  *
  *
- * \see dRIChDetector
- * \see dRIChSubsystem
+ * \see EICG4dRICHDetector
+ * \see EICG4dRICHSubsystem
  *
  */
-class dRIChSubsystem : public PHG4DetectorSubsystem 
+class EICG4dRICHSubsystem : public PHG4DetectorSubsystem 
 {
   public:
     //! constructor
-    dRIChSubsystem(const std::string &name = "dRICh");
+    EICG4dRICHSubsystem(const std::string &name = "EICG4dRICH");
 
     //! destructor
-    virtual ~dRIChSubsystem() {}
+    virtual ~EICG4dRICHSubsystem() {}
 
     /*!
     creates relevant hit nodes that will be populated by the stepping action and
@@ -44,6 +44,9 @@ class dRIChSubsystem : public PHG4DetectorSubsystem
     PHG4Detector *GetDetector() const override;
 
     PHG4SteppingAction *GetSteppingAction() const override { return m_SteppingAction; }
+
+    void SetGeometryFile(const std::string &fileName) { m_geoFile = fileName; }   
+ 
     //! Print info (from SubsysReco)
     void Print(const std::string &what = "ALL") const override;
 
@@ -54,11 +57,13 @@ class dRIChSubsystem : public PHG4DetectorSubsystem
   private:
     //! detector construction
     /*! derives from PHG4Detector */
-    dRIChDetector *m_Detector;
+    EICG4dRICHDetector *m_Detector;
 
     //! particle tracking "stepping" action
     /*! derives from PHG4SteppingActions */
     PHG4SteppingAction *m_SteppingAction;
+   
+    std::string m_geoFile;
 };
 
 #endif // DRICHSUBSYSTEM_H

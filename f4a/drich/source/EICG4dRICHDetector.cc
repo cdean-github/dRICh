@@ -1,6 +1,6 @@
-#include "dRIChDetector.h"
-#include "ci_DRICH_Config.hh"
-#include "g4dRIChOptics.hh"
+#include "EICG4dRICHDetector.h"
+#include "EICG4dRICHConfig.hh"
+#include "EICG4dRICHOptics.hh"
 
 #include <fun4all/Fun4AllBase.h>
 
@@ -23,20 +23,15 @@
 class G4VSolid;
 class PHCompositeNode;
 
-/*
-using std::cerr;
-using std::cout;
-using std::endl;
-using std::string;
-*/
 // ---------------------------------------------------
-dRIChDetector::dRIChDetector(PHG4Subsystem *subsys, PHCompositeNode *Node,
-                             PHParameters *parameters, const std::string &dnam)
-    : PHG4Detector(subsys, Node, dnam), m_Params(parameters)
+EICG4dRICHDetector::EICG4dRICHDetector(PHG4Subsystem *subsys, PHCompositeNode *Node,
+                                       PHParameters *parameters, const std::string &dnam)
+    : PHG4Detector(subsys, Node, dnam)
+    , m_Params(parameters)
     {}
 
 // ---------------------------------------------------
-int dRIChDetector::IsInDetector(G4VPhysicalVolume *volume) const 
+int EICG4dRICHDetector::IsInDetector(G4VPhysicalVolume *volume) const 
 {
   std::set<G4VPhysicalVolume *>::const_iterator iter =
       m_PhysicalVolumesSet.find(volume);
@@ -48,26 +43,16 @@ int dRIChDetector::IsInDetector(G4VPhysicalVolume *volume) const
 }
 
 // ---------------------------------------------------
-void dRIChDetector::ConstructMe(G4LogicalVolume *logicWorld) 
+void EICG4dRICHDetector::ConstructMe(G4LogicalVolume *logicWorld) 
 {
-
-  // get env vars
-  char *drichHome = std::getenv("DRICH_HOME");
-  if (drichHome == NULL) 
-  {
-    std::cerr << "[+] ERROR: DRICH_HOME env var not set" << std::endl;
-    return;
-  }
-
-  // load model text file and configuration
-  ci_DRICH_Config cfg;
-  cfg.model_file = "/sphenix/user/cdean/ECCE/test/dRICh/f4a/drich/source/drich-g4model.txt";
-  std::cout << "[+] MODEL TEXT FILE: " << cfg.model_file << std::endl;
+  EICG4dRICHConfig cfg;
+  cfg.model_file = m_Params->get_string_param("mapping_file");
+  if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) std::cout << "[+] MODEL TEXT FILE: " << cfg.model_file << std::endl;
   // - check existence
   std::ifstream mf(cfg.model_file.data());
   if (!mf.is_open()) 
   {
-    std::cerr << "[+] ERROR in dRIChDetector: cannot find MODEL TEXT FILE" << std::endl;
+    std::cerr << "[+] ERROR in " << __FILE__ << ": cannot find MODEL TEXT FILE" << std::endl;
     return;
   }
   mf.close();
@@ -82,33 +67,39 @@ void dRIChDetector::ConstructMe(G4LogicalVolume *logicWorld)
   // logicWorld->SetVisAttributes(vis);
 
   // build detector by text file
-  std::cout << "[+] read model text file" << std::endl;
+  if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) std::cout << "[+] read model text file" << std::endl;
   G4tgbVolumeMgr *volmgr = G4tgbVolumeMgr::GetInstance();
   volmgr->AddTextFile(cfg.model_file);
-  std::cout << "[+] construct detector from text file" << std::endl;
+  if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) std::cout << "[+] construct detector from text file" << std::endl;
   G4VPhysicalVolume *vesselPhysVol = volmgr->ReadAndConstructDetector();
-  std::cout << "[+] detector summary" << std::endl;
-  volmgr->DumpSummary();
-  std::cout << "[+] detector G4Solid list" << std::endl;
-  volmgr->DumpG4SolidList();
+  if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE) 
+  {
+    std::cout << "[+] detector summary" << std::endl;
+    volmgr->DumpSummary();
+    std::cout << "[+] detector G4Solid list" << std::endl;
+    volmgr->DumpG4SolidList();
+  }
 
-  // material optical properties (see shared header g4dRIChOptics.hh)
+  // material optical properties (see shared header EICG4dRICHOptics.hh)
   // - aerogel
-  auto aeroPO = new g4dRIChAerogel("ciDRICHaerogelMat");
+  auto aeroPO = new EICG4dRICHAerogel("EICG4dRICHaerogelMat");
   aeroPO->setOpticalParams(cfg.aerOptModel); // mode=3: use experimental data
   // - acrylic filter
-  printf("[+] Acrylic Wavelength Threshold : %f nm\n", cfg.filter_thr / (nm));
-  auto acryPO = new g4dRIChFilter("ciDRICHfilterMat");
+  if (Verbosity() >= Fun4AllBase::VERBOSITY_MORE)
+  {
+    std::cout << "[+] Acrylic Wavelength Threshold : " << cfg.filter_thr / (nm) << " nm\n" << std::endl;
+  }
+  auto acryPO = new EICG4dRICHFilter("EICG4dRICHfilterMat");
   acryPO->setOpticalParams(cfg.filter_thr);
   // - gas radiator
-  auto gasPO = new g4dRIChGas("ciDRICHgasMat");
+  auto gasPO = new EICG4dRICHGas("EICG4dRICHgasMat");
   gasPO->setOpticalParams();
   // - photo sensors
-  auto photoSensor = new g4dRIChPhotosensor("ciDRICHpsst");
-  photoSensor->setOpticalParams("ciDRICH");
+  auto photoSensor = new EICG4dRICHPhotosensor("EICG4dRICHpsst");
+  photoSensor->setOpticalParams("EICG4dRICH");
   // - mirror (simular to photosensor, but different params)
-  auto mirror = new g4dRIChMirror("ciDRICHmirror");
-  mirror->setOpticalParams("ciDRICH");
+  auto mirror = new EICG4dRICHMirror("EICG4dRICHmirror");
+  mirror->setOpticalParams("EICG4dRICH");
 
   // add to logical world
   logicWorld->AddDaughter(vesselPhysVol);
@@ -125,7 +116,7 @@ void dRIChDetector::ConstructMe(G4LogicalVolume *logicWorld)
 // - use the "activation filter" to decide for which volumes to save hits
 // - the petal number is added to `m_PetalMap`, which together
 //   with the copy number, provides a unique ID for each photo sensor
-void dRIChDetector::ActivateVolumeTree(G4VPhysicalVolume *volu, G4int petal) 
+void EICG4dRICHDetector::ActivateVolumeTree(G4VPhysicalVolume *volu, G4int petal) 
 {
 
   // get objects
@@ -142,8 +133,7 @@ void dRIChDetector::ActivateVolumeTree(G4VPhysicalVolume *volu, G4int petal)
   // activation filter: use this to decide which volumes to save
   // hits for, i.e., which volumes are "active"
   // TODO: need to decide what volume we want to be active
-  G4bool activate = voluName.contains("psst") || voluName.contains("vessel");
-  activate = true; // override
+  G4bool activate = true;// voluName.contains("psst") || voluName.contains("vessel");
   if (activate) 
   {
     if (Verbosity() >= Fun4AllBase::VERBOSITY_SOME)  
@@ -165,7 +155,7 @@ void dRIChDetector::ActivateVolumeTree(G4VPhysicalVolume *volu, G4int petal)
 
 // ---------------------------------------------------
 // get petal number
-int dRIChDetector::GetPetal(G4VPhysicalVolume *volu) 
+int EICG4dRICHDetector::GetPetal(G4VPhysicalVolume *volu) 
 {
   int petalNum;
   try 
@@ -174,7 +164,7 @@ int dRIChDetector::GetPetal(G4VPhysicalVolume *volu)
   } 
   catch (const std::out_of_range &ex) 
   {
-    std::cerr << "ERROR in dRIChDetector: cannot find petal associated with volume"
+    std::cerr << "ERROR in EICG4dRICHDetector: cannot find petal associated with volume"
          << std::endl;
     return -1;
   }
@@ -183,15 +173,15 @@ int dRIChDetector::GetPetal(G4VPhysicalVolume *volu)
 
 // ---------------------------------------------------
 // get PSST number
-int dRIChDetector::GetPSST(G4VPhysicalVolume *volu) 
+int EICG4dRICHDetector::GetPSST(G4VPhysicalVolume *volu) 
 {
   return volu->GetName().contains("psst") ? volu->GetCopyNo() : 0;
 }
 
 // ---------------------------------------------------
-void dRIChDetector::Print(const std::string &what) const 
+void EICG4dRICHDetector::Print(const std::string &what) const 
 {
-  std::cout << "dRICh Detector:" << std::endl;
+  std::cout << "EICG4dRICH Detector:" << std::endl;
   if (what == "ALL" || what == "VOLUME") 
   {
     std::cout << "Version 0.1" << std::endl;

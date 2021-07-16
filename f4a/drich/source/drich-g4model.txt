@@ -1,18 +1,18 @@
-// Define the dRICh Geometry and Materials
+// Define the EICG4dRICH Geometry and Materials
 //
-//   the current dRICh mother volume is a conical vessel filled by the gas radiator
+//   the current EICG4dRICH mother volume is a conical vessel filled by the gas radiator
 //   the vessel hosts 6 petals
 //   each petal has an aerogel radiator, an acrylic filter, a mirror and sensor surface
 //
 //   z axis is along beam pipe
 //   x axis is transverse to beam pipe
-//   reference dRICh petal has y=0
+//   reference EICG4dRICH petal has y=0
 //
 // Ref:
 //    https://geant4.web.cern.ch/sites/geant4.web.cern.ch/files/geant4/collaboration/working_groups/geometry/docs/textgeom/textgeom.pdf
 //    geant4 source/persistency/ascii
 //
-// original dRICh simulation source code: github.com/EIC-eRD11/dualRICH_inMEIC
+// original EICG4dRICH simulation source code: github.com/EIC-eRD11/dualRICH_inMEIC
 //
 // Authors: C. Cisbani, A. Del Dotto, C. Fanelli
 //
@@ -25,18 +25,18 @@
 // names of volumes, surface, materials - they mat differ from porting to porting
 // they are used in optical description classes and likely in the definition of sensity volume responses
 // :PS parameter string seems to be not documented yet! and probably no operations on strings are permitted
-:PS vesselName   ciDRICHvessel      // dRICh container vessel
-:PS petalName    ciDRICHpetal       // single assembly petal volume, filled by gas and containing the other components
-:PS aerName      ciDRICHaerogel
-:PS filterName	 ciDRICHfilter
-:PS mirrorName   ciDRICHmirror
-:PS sensorTName  ciDRICHpsst        // single photo sensor tile
+:PS vesselName   EICG4dRICHvessel      // EICG4dRICH container vessel
+:PS petalName    EICG4dRICHpetal       // single assembly petal volume, filled by gas and containing the other components
+:PS aerName      EICG4dRICHaerogel
+:PS filterName	 EICG4dRICHfilter
+:PS mirrorName   EICG4dRICHmirror
+:PS sensorTName  EICG4dRICHpsst        // single photo sensor tile
 //
 :PS vesselMatName G4_Al              // container vessel material
-:PS gasMatName    ciDRICHgasMat
-:PS aerMatName    ciDRICHaerogelMat
-:PS filterMatName ciDRICHfilterMat
-:PS mirrorMatName ciDRICHmirrorMat
+:PS gasMatName    EICG4dRICHgasMat
+:PS aerMatName    EICG4dRICHaerogelMat
+:PS filterMatName EICG4dRICHfilterMat
+:PS mirrorMatName EICG4dRICHmirrorMat
 :PS sensorMatName G4_Si
 
 // ----------
@@ -45,7 +45,7 @@
 // be carefull, management of units in the geometry text file is somehow confusing (to me-EC)
 // ----------
 
-// vessel is the whole dRICH mother volume (including the walls)
+// vessel is the whole EICG4dRICH mother volume (including the walls)
 :P vesselInRadius 9.5*cm
 :P vesselLengthZ 161.0*cm
 :P vesselOutRadiusEntrance 210.5*cm
@@ -106,7 +106,7 @@
 // Materials G4_SILICON_DIOXIDE, G4_AIR, G4_F, G4_C
 // ------------------------------------------------
 
-:MIXT_BY_VOLUME ciDRICHaerogelMat $aerogelDensity 2
+:MIXT_BY_VOLUME EICG4dRICHaerogelMat $aerogelDensity 2
       G4_AIR $airFractionInAerogel
       G4_SILICON_DIOXIDE $sio2FractionInAerogel
 
@@ -115,12 +115,12 @@
       G4_PLEXIGLASS 0.99
       G4_POLYVINYL_ACETATE 0.01
 
-:MIXT_BY_NATOMS ciDRICHgasMat $gasDensity 2
+:MIXT_BY_NATOMS EICG4dRICHgasMat $gasDensity 2
       C 2
       F 6
 
 // acrylic material **To Be Improved**
-:MIXT_BY_WEIGHT ciDRICHmirrorMat 1.19 2
+:MIXT_BY_WEIGHT EICG4dRICHmirrorMat 1.19 2
       G4_PLEXIGLASS 0.99
       G4_POLYVINYL_ACETATE 0.01
       
@@ -129,7 +129,7 @@
 // Solids and Logical Volume combined
 // ----------------------------------
 
-// vessel: this is the mother volume of the dRICH, include thicknesses
+// vessel: this is the mother volume of the EICG4dRICH, include thicknesses
 :VOLU $vesselName CONS $vesselInRadius $vesselOutRadiusEntrance $vesselInRadius $vesselOutRadiusExit $vesselLengthZ/2. 0. 360. $vesselMatName
 :COLOR $vesselName 0.95 0.95 0.95 0.95
 

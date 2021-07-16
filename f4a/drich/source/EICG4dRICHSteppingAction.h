@@ -6,23 +6,23 @@
 #include <G4Track.hh>
 #include <g4main/PHG4SteppingAction.h>
 
-class dRIChDetector;
+class EICG4dRICHDetector;
 
 class G4Step;
 class G4VPhysicalVolume;
 class PHCompositeNode;
-class dRIChHit;
+class EICG4dRICHHit;
 class PHG4HitContainer;
 class PHParameters;
 
-class dRIChSteppingAction : public PHG4SteppingAction 
+class EICG4dRICHSteppingAction : public PHG4SteppingAction 
 {
   public:
     //! constructor
-    dRIChSteppingAction(dRIChDetector *, const PHParameters *parameters);
+    EICG4dRICHSteppingAction(EICG4dRICHDetector *, const PHParameters *parameters);
 
     //! destructor
-    virtual ~dRIChSteppingAction();
+    virtual ~EICG4dRICHSteppingAction();
 
     //! stepping action
     virtual bool UserSteppingAction(const G4Step *, bool);
@@ -37,11 +37,11 @@ class dRIChSteppingAction : public PHG4SteppingAction
                  bool resetAccumulators);
 
     //! pointer to the detector
-    dRIChDetector *m_Detector;
+    EICG4dRICHDetector *m_Detector;
     const PHParameters *m_Params;
     //! pointer to hit container
     PHG4HitContainer *m_HitContainer;
-    dRIChHit *m_Hit;
+    EICG4dRICHHit *m_Hit;
     PHG4HitContainer *m_SaveHitContainer;
     G4VPhysicalVolume *m_SaveVolPre;
     G4VPhysicalVolume *m_SaveVolPost;

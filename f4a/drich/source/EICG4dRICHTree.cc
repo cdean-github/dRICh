@@ -1,4 +1,4 @@
-#include "dRIChTree.h"
+#include "EICG4dRICHTree.h"
 
 // TODO: may not need things commented with `---`
 
@@ -18,7 +18,7 @@
 //#include <g4main/PHG4TruthInfoContainer.h> //---
 
 // drich
-#include "dRIChHit.h"
+#include "EICG4dRICHHit.h"
 
 // root
 #include <TFile.h>
@@ -40,28 +40,28 @@ using std::std::endl;
 using std::string;
 */
 //-------------------------------------
-dRIChTree::dRIChTree(const std::string &name, const std::string &filename)
+EICG4dRICHTree::EICG4dRICHTree(const std::string &name, const std::string &filename)
     : SubsysReco(name)
     , m_outfileN(filename)
+    , evnum(0)
 //, m_hm(nullptr) //---
 {
   // resetVars(); //---
-  evnum = 0;
   initTrees();
 }
 
 //-------------------------------------
-dRIChTree::~dRIChTree() 
+EICG4dRICHTree::~EICG4dRICHTree() 
 {
   delete m_tree;
   // delete m_hm; //---
 }
 
 //-------------------------------------
-int dRIChTree::Init(PHCompositeNode *topNode) 
+int EICG4dRICHTree::Init(PHCompositeNode *topNode) 
 {
   if (Verbosity() >  VERBOSITY_A_LOT)
-    std::cout << std::endl << "CALL dRIChTree::Init" << std::endl;
+    std::cout << std::endl << "CALL EICG4dRICHTree::Init" << std::endl;
 
   m_outfile = new TFile(m_outfileN.c_str(), "RECREATE");
 
@@ -69,12 +69,12 @@ int dRIChTree::Init(PHCompositeNode *topNode)
 }
 
 //-------------------------------------
-int dRIChTree::process_event(PHCompositeNode *topNode) 
+int EICG4dRICHTree::process_event(PHCompositeNode *topNode) 
 {
   if (Verbosity() >  VERBOSITY_A_LOT)
   {
     std::cout << std::endl
-         << "CALL dRIChTree::process_event"
+         << "CALL EICG4dRICHTree::process_event"
          << " ====================" << std::endl;
   }
 
@@ -84,9 +84,9 @@ int dRIChTree::process_event(PHCompositeNode *topNode)
 }
 
 //-------------------------------------
-int dRIChTree::End(PHCompositeNode *topNode) 
+int EICG4dRICHTree::End(PHCompositeNode *topNode) 
 {
-  if (Verbosity() >= VERBOSITY_MORE) std::cout << std::endl << "CALL dRIChTree::End" << std::endl;
+  if (Verbosity() >= VERBOSITY_MORE) std::cout << std::endl << "CALL EICG4dRICHTree::End" << std::endl;
 
   m_outfile->cd();
   m_tree->Write();
@@ -94,16 +94,16 @@ int dRIChTree::End(PHCompositeNode *topNode)
   m_outfile->Close();
 
   delete m_outfile;
-  if (Verbosity() >= VERBOSITY_MORE) std::cout << "DONE dRIChTree::End" << std::endl;
+  if (Verbosity() >= VERBOSITY_MORE) std::cout << "DONE EICG4dRICHTree::End" << std::endl;
   return 0;
 }
 
 //----------------------------------------------
-void dRIChTree::getHits(PHCompositeNode *topNode) 
+void EICG4dRICHTree::getHits(PHCompositeNode *topNode) 
 {
 
   // get hits container
-  PHG4HitContainer *hitCont = findNode::getClass<PHG4HitContainer>(topNode, "G4HIT_dRICh_0"); // TODO: do not hard code name
+  PHG4HitContainer *hitCont = findNode::getClass<PHG4HitContainer>(topNode, "G4HIT_dRICH_0"); // TODO: do not hard code name
 
   if (!hitCont) 
   {
@@ -118,7 +118,7 @@ void dRIChTree::getHits(PHCompositeNode *topNode)
   // loop over hits, filling tree
   auto hitRange = hitCont->getHits();
   for (auto hitIter = hitRange.first; hitIter != hitRange.second; hitIter++) {
-    dRIChHit *hit = dynamic_cast<dRIChHit *>(hitIter->second);
+    EICG4dRICHHit *hit = dynamic_cast<EICG4dRICHHit *>(hitIter->second);
 
     if (Verbosity() >  VERBOSITY_A_LOT) 
     {
@@ -147,7 +147,7 @@ void dRIChTree::getHits(PHCompositeNode *topNode)
 }
 
 //---------------------------------------------
-void dRIChTree::vectorToArray(G4ThreeVector vec, Double_t *arr) 
+void EICG4dRICHTree::vectorToArray(G4ThreeVector vec, Double_t *arr) 
 {
   arr[0] = (Double_t)vec.x();
   arr[1] = (Double_t)vec.y();
@@ -155,7 +155,7 @@ void dRIChTree::vectorToArray(G4ThreeVector vec, Double_t *arr)
 }
 
 //---------------------------------------------
-void dRIChTree::initTrees() 
+void EICG4dRICHTree::initTrees() 
 {
   m_tree = new TTree("tree", "tree");
   m_tree->Branch("evnum", &evnum, "evnum/I");
@@ -180,7 +180,7 @@ void dRIChTree::initTrees()
 //----------------------------------------
 /*
 // TODO: may not need this...
-void dRIChTree::resetVars() {
+void EICG4dRICHTree::resetVars() {
   evnum = 0;
   trackID = -999;
   for(int c=0; c<3; c++) hitPos[c]=-999;
